@@ -6,7 +6,7 @@ router.get('/', function(req, res) {
   var db = req.db;
   var json_result = "{}";
   db.collection('usercollection').find().toArray(function(err, result) {
-    if (err) throw err;
+    if (err) { throw err; }
     console.log(result);
 	json_result = result;
 	res.json(json_result);
