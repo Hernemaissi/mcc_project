@@ -1,18 +1,15 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var mongoskin = require('mongoskin')
-var bodyParser = require('body-parser');
-
-var db = mongoskin.db('mongodb://@localhost:27017/mcc_data', {safe:true})
-
-var routes = require('./routes/index');
-var users = require('./routes/users');
-var contacts = require('./routes/contacts');
-
-var app = express();
+var express = require('express'),
+  path = require('path'),
+  favicon = require('serve-favicon'),
+  logger = require('morgan'),
+  cookieParser = require('cookie-parser'),
+  mongoskin = require('mongoskin'),
+  bodyParser = require('body-parser'),
+  db = mongoskin.db('mongodb://@localhost:27017/mcc_data', {safe:true}),
+  routes = require('./routes/index'),
+  users = require('./routes/users'),
+  contacts = require('./routes/contacts'),
+  app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -28,8 +25,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Make our db accessible to our router
 app.use(function(req,res,next){
-    req.db = db;
-    next();
+  req.db = db;
+  next();
 });
 
 app.use('/', routes);
@@ -38,9 +35,9 @@ app.use('/contacts', contacts);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
 // error handlers
@@ -48,23 +45,23 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+    message: err.message,
+      error: err
     });
+  });
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: {}
+  });
 });
 
 

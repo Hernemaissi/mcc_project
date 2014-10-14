@@ -1,40 +1,40 @@
-var express = require('express');
-var router = express.Router();
-var _ = require('lodash-node');
+var express = require('express'),
+  router = express.Router(),
+  _ = require('lodash-node/underscore');
 
-var respondResult = function(status, err, result){
+var respondResult = function(status, res, err, result){
     if(err) { throw err; }
     console.log(result);
     res.json(result).status(status);
   },
-  respondResultOk = _.partial(respondResult, 200)
+  respondResultOk = _.partial(respondResult, 200),
   respondResultCreated = _.partial(respondResult, 201);
 
 /* GET users listing. */
 router.get('/', function(req, res) {
-  req.db.collection('contactcollection').find().toArray(respondResultOk);
+  req.db.collection('contactcollection').find().toArray(_.partial(respondResultOk, res));
 });
 
 router.get('/search', function(req, res) {
   console.log("Search: " + req.query.q);
   var q = new RegExp(".*" + req.query.q + ".*", 'i');
-  req.db.collection('contactcollection').find({name: q}).toArray(respondResultOk);
+  req.db.collection('contactcollection').find({name: q}).toArray(_.partial(respondResultOk, res));
 });
 
 
 router.get('/:id', function(req, res) {
   console.log("Fetch: " + req.params.id);
-  req.db.collection('contactcollection').findById(req.params.id, respondResultOk);
+  req.db.collection('contactcollection').findById(req.params.id, _.partial(respondResultOk, res));
 });
 
 router.post('/', function(req, res) {
   var data = _.pick(req.body, 'name', 'phone', 'email');
-  req.db.collection('contactcollection').insert(data, respondResultCreated);
+  req.db.collection('contactcollection').insert(data, _.partial(respondResultCreated, res));
 });
 
 router.delete('/:id', function(req, res) {
   console.log("Delete: " + req.params.id);
-  req.db.collection('contactcollection').removeById(req.params.id, respondResultOk);
+  req.db.collection('contactcollection').removeById(req.params.id, _.partial(respondResultOk, res));
 });
 
 
