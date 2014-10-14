@@ -12,6 +12,7 @@ router.get('/', function(req, res) {
 	res.json(json_result);
   });
 });
+
 router.get('/:name', function(req, res) {
   var db = req.db;
   var json_result = "{}";
