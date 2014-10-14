@@ -17,8 +17,6 @@
 
 ## API
 
-### Contacts
-
 #### GET /contacts
 ##### Description
   Array of contact information
@@ -29,6 +27,14 @@
     "email" : "email@example.com",
     "phone" : "+123 456 7890"
   }
+  ```
+##### Test Command
+  ```
+    curl \
+      -X GET \
+      -H "Accept: application/json" \
+      -H "Content-Type: application/json" \
+      http://localhost:3000/contacts
   ```
 
 #### GET /contacts/:id
@@ -49,6 +55,15 @@
     ...
   ]
   ```
+##### Test Command
+  Replace :id with a contact id
+  ```
+    curl \
+      -X GET \
+      -H "Accept: application/json" \
+      -H "Content-Type: application/json" \
+      http://localhost:3000/contacts/:id
+  ```
 
 #### GET /contacts/search
 ##### Description
@@ -67,6 +82,15 @@
     },
     ...
   ]
+  ```
+##### Test Command
+  Replace q with different name partial if needed
+  ```
+    curl \
+      -X GET \
+      -H "Accept: application/json" \
+      -H "Content-Type: application/json" \
+      http://localhost:3000/contacts/search?q=te
   ```
 
 #### POST /contacts
@@ -88,6 +112,15 @@
     "phone" : "+123 456 7890"
   }
   ```
+##### Test Command
+  ```
+    curl \
+      -X POST \
+      -H "Accept: application/json" \
+      -H "Content-Type: application/json" \
+      -d '{"name":"test","email":"test@example.com", "phone":"+123 456 7890"}' \
+      http://localhost:3000/contacts
+  ```
 
 #### DELETE /contacts/:id
 ##### Description
@@ -103,4 +136,13 @@
     "email" : "email@example.com",
     "phone" : "+123 456 7890"
   }
+  ```
+##### Test Command
+  Replace :id with a contact id
+  ```
+    curl \
+      -X DELETE \
+      -H "Accept: application/json" \
+      -H "Content-Type: application/json" \
+      http://localhost:3000/contacts/:id
   ```
