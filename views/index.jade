@@ -1,5 +1,117 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  div.container
+    ol.breadcrumb(ng-controller="Navigation as nav")
+      li(ng-class="{active: nav.pathEquals('') || nav.pathEquals('/')}")
+        a(href="/") Index
+      li.active(ng-if="nav.pathStarts('/show')") {{nav.contact.name}}
+      li.active(ng-if="nav.pathStarts('/edit')") {{nav.contact.name}}
+      li.active(ng-if="nav.pathStarts('/create')") Create
+    div(ng-view)
+
+  script(type="text/ng-template" id="/templates/index.html")
+    a.btn.btn-primary(href="/create")
+      span.fa.fa-plus
+            span Create new contact
+    table.table(ng-controller="Index as index")
+      thead
+        tr
+          th Name
+          th Email
+          th
+      tbody
+        tr(ng-repeat="contact in index.contacts|orderBy:'name'")
+          td
+            a(ng-href="/show/{{contact._id}}") {{ contact.name }}
+          td {{ contact.email }}
+          td
+            button.btn.btn-danger(ng-click="delete(contact)")
+              span.fa.fa-fw.fa-trash-o
+              span Delete
+
+  script(type="text/ng-template" id="/templates/show.html")
+    div.col-xs-12.form-horizontal(ng-controller="Show as show")
+      div.form-group
+        h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Contact details
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Name
+        div.col-xs-8.col-sm-10.form-control-static {{show.contact.name}}
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Email
+        div.col-xs-8.col-sm-10.form-control-static {{show.contact.email}}
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Phone
+        div.col-xs-8.col-sm-10.form-control-static {{show.contact.phone}}
+      div.form-group
+        div.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2
+          a(ng-href="/edit/{{show.contact._id}}")
+            span.fa.fa-fw.fa-edit
+            span Edit
+
+  script(type="text/ng-template" id="/templates/edit.html")
+    form.col-xs-12.form-horizontal(ng-controller="Edit as edit")
+      div.form-group
+        h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Contact details
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Name
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="edit.contact.name")
+          div.input-group-addon
+            span.fa.fa-fw.fa-user
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Email
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="email" ng-model="edit.contact.email")
+          div.input-group-addon
+            span.fa.fa-fw.fa-envelope-o
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Phone
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="edit.contact.phone")
+          div.input-group-addon
+            span.fa.fa-fw.fa-phone
+      div.form-group
+        div.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2
+          button.btn.btn-default(type="button" ng-click="edit.cancelChanges()" ng-disabled="!edit.changed(edit.contact)")
+            span.fa.fa-fw.fa-trash-o
+            span Remove changes
+          .pull-right
+            button.btn.btn-default(type="button" ng-click="edit.cancel(edit.contact)")
+              span.fa.fa-fw.fa-remove
+              span Cancel
+            button.btn.btn-primary(type="button" ng-click="edit.save(edit.contact)")
+              span.fa.fa-fw.fa-save
+              span Save
+
+  script(type="text/ng-template" id="/templates/create.html")
+    form.col-xs-12.form-horizontal(ng-controller="Create as create")
+      div.form-group
+        h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Contact details
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Name
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="create.contact.name")
+          div.input-group-addon
+            span.fa.fa-fw.fa-user
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Email
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="email" ng-model="create.contact.email")
+          div.input-group-addon
+            span.fa.fa-fw.fa-envelope-o
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Phone
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="create.contact.phone")
+          div.input-group-addon
+            span.fa.fa-fw.fa-phone
+      div.form-group
+        div.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2
+          .pull-right
+            button.btn.btn-default(type="button" ng-click="create.cancel()")
+              span.fa.fa-fw.fa-remove
+              span Cancel
+            button.btn.btn-primary(type="button" ng-click="create.create(create.contact)")
+              span.fa.fa-fw.fa-save
+              span Create
