@@ -4,11 +4,13 @@ var express = require('express'),
 
 var respondResult = function(status, res, err, result){
     if(err) { throw err; }
-    console.log(result);
+    console.log("Responding with: ", result);
     res.json(result).status(status);
   },
   respondResultOk = _.partial(respondResult, 200),
-  respondResultCreated = _.partial(respondResult, 201);
+  respondResultCreated = function(res, err, result){
+    respondResult(201, res, err, result[0]);
+  };
 
 /* GET users listing. */
 router.get('/', function(req, res) {
@@ -29,6 +31,7 @@ router.get('/:id', function(req, res) {
 
 router.post('/', function(req, res) {
   var data = _.pick(req.body, 'name', 'phone', 'email');
+  console.log("Create: ", data);
   req.db.collection('contactcollection').insert(data, _.partial(respondResultCreated, res));
 });
 
