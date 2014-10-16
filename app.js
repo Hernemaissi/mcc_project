@@ -8,6 +8,7 @@ var express = require('express'),
   routes = require('./routes/index'),
   users = require('./routes/users'),
   contacts = require('./routes/contacts'),
+  groups = require('./routes/groups'),
   app = express();
 
 // view engine setup
@@ -31,6 +32,7 @@ app.use(function(req,res,next){
 app.use('/', routes);
 app.use('/users', users);
 app.use('/contacts', contacts);
+app.use('/groups', groups);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

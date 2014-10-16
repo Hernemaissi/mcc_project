@@ -37,6 +37,8 @@ router.post('/', function(req, res) {
 
 router.delete('/:id', function(req, res) {
   console.log("Delete: " + req.params.id);
+  req.db.collection('groupcollection')
+	.update({members: req.params.id}, {'$pull' : { members: req.params.id}}, { multi:true}, function(err) {});
   req.db.collection('contactcollection').removeById(req.params.id, _.partial(respondResultOk, res));
 });
 
