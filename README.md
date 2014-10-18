@@ -15,6 +15,26 @@
 3. `mongod --dbpath data`
 4. To test using mongo console `mongo mcc_data`
 
+## Deployment
+### Install packages
+```
+  sudo apt-get update
+  sudo apt-get install node
+  sudo apt-get install mongodb
+  sudo apt-get install git
+  npm install -g nvm
+  npm install -g forever
+  nvm install node v0.11.14
+  npm install
+```
+
+### Clone repo
+  `git clone https://github.com/Hernemaissi/mcc_project.git`
+
+### Run
+  1. Go to mongo console (`mongo`) and create/check db mcc_data exists `use mcc_data`
+  2. Start node.js server `forever start bin/www` (possibly needed to also specify node with `nvm use v0.11.14`)
+
 ## API
 
 #### GET /contacts
