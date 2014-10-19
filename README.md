@@ -61,7 +61,7 @@
 ##### Description
   Get contact information by id
 ##### Route Params
-   Param  |   Value 
+   Param  |   Value 
   ------- | -----------
      id   |  Record id
 ##### Response
@@ -89,7 +89,7 @@
 ##### Description
   Get contact information by id
 ##### Request Query Params
-   Param  |   Value 
+   Param  |   Value 
   ------- | -----------
     q     |  Contact name (case-insensitive substring matched)
 ##### Response
@@ -146,7 +146,7 @@
 ##### Description
   Delete contact information entry by id
 ##### Route Params
-   Param  |   Value 
+   Param  |   Value 
   ------- | -----------
      id   |  Record id
 ##### Response
@@ -165,4 +165,97 @@
       -H "Accept: application/json" \
       -H "Content-Type: application/json" \
       http://localhost:3000/contacts/:id
+  ```
+  
+#### GET /groups
+##### Description
+  Array of group information
+##### Response
+  ```json
+  {
+      "name" : "name",
+      "members" : ["ID", "ID2"...]
+  },
+  ```
+
+#### GET /groups/:id
+##### Description
+  Get group information by id
+##### Route Params
+   Param  |   Value 
+  ------- | -----------
+     id   |  Record id
+##### Response
+  ```json
+  [
+    {
+      "name" : "name",
+      "members" : ["ID", "ID2"...]
+    },
+    ...
+  ]
+  ```
+  
+#### POST /groups
+##### Description
+  Create new group entry
+##### Request Body
+  ```json
+  {
+    "name" : "name"
+  }
+  ```
+##### Response
+  ```json
+  {
+    "name" : "name",
+    "members" : []
+  }
+  ```
+  
+#### DELETE /groups/:id
+##### Description
+  Delete group entry by id
+##### Route Params
+   Param  |   Value 
+  ------- | -----------
+     id   |  Record id
+##### Response
+  ```json
+  {
+      "name" : "name",
+      "members" : ["ID", "ID2"...]
+  },
+  ```
+  
+#### PUT /groups/:id
+##### Description
+  Adds or removes a contact from group
+##### Route Params
+   Param  |   Value 
+  ------- | -----------
+     id   |  Record id
+
+##### Request Body on add
+  ```json
+  {
+    "add" : "true",
+    "contact_id" : ID
+  }
+  ```
+##### Request Body on remove
+  ```json
+  {
+    "contact_id" : ID
+  }
+  ```
+
+##### Response on add
+  ```json
+  "Member added"
+  ```
+  
+##### Response on remove
+  ```json
+  "Member removed"
   ```
