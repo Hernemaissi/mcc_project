@@ -10,11 +10,11 @@ block content
       li.active(ng-if="nav.pathStarts('/create')") Create
     div(ng-view)
 
-  script(type="text/ng-template" id="/templates/index.html")
+  script(type="text/ng-template" id="/templates/contacts/index.html")
     a.btn.btn-primary(href="/create")
       span.fa.fa-plus
             span Create new contact
-    table.table(ng-controller="Index as index")
+    table.table(ng-controller="ContactIndex as index")
       thead
         tr
           th Name
@@ -30,8 +30,8 @@ block content
               span.fa.fa-fw.fa-trash-o
               span Delete
 
-  script(type="text/ng-template" id="/templates/show.html")
-    div.col-xs-12.form-horizontal(ng-controller="Show as show")
+  script(type="text/ng-template" id="/templates/contacts/show.html")
+    div.col-xs-12.form-horizontal(ng-controller="ContactShow as show")
       div.form-group
         h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Contact details
       div.form-group
@@ -49,8 +49,8 @@ block content
             span.fa.fa-fw.fa-edit
             span Edit
 
-  script(type="text/ng-template" id="/templates/edit.html")
-    form.col-xs-12.form-horizontal(ng-controller="Edit as edit")
+  script(type="text/ng-template" id="/templates/contacts/edit.html")
+    form.col-xs-12.form-horizontal(ng-controller="ContactEdit as edit")
       div.form-group
         h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Contact details
       div.form-group
@@ -84,8 +84,8 @@ block content
               span.fa.fa-fw.fa-save
               span Save
 
-  script(type="text/ng-template" id="/templates/create.html")
-    form.col-xs-12.form-horizontal(ng-controller="Create as create")
+  script(type="text/ng-template" id="/templates/contacts/create.html")
+    form.col-xs-12.form-horizontal(ng-controller="ContactCreate as create")
       div.form-group
         h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Contact details
       div.form-group

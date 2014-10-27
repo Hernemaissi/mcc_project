@@ -2,52 +2,62 @@ angular.module('mcc', ['ngRoute'])
 .config(function($locationProvider, $routeProvider){
   $locationProvider.html5Mode(true);
   $routeProvider.when('', {
-    templateUrl: '/templates/index.html',
+    templateUrl: '/templates/contacts/index.html',
   }).when('/', {
-    templateUrl: '/templates/index.html',
+    templateUrl: '/templates/contacts/index.html',
   }).when('/show/:id', {
-    templateUrl: '/templates/show.html',
+    templateUrl: '/templates/contacts/show.html',
   }).when('/edit/:id', {
-    templateUrl: '/templates/edit.html',
+    templateUrl: '/templates/contacts/edit.html',
   }).when('/create', {
-    templateUrl: '/templates/create.html',
+    templateUrl: '/templates/contacts/create.html',
   });
 })
-.service('Contacts', function($http, $q, $routeParams){
+.factory('SimpleHttpService', function($http, $q, $routeParams){
   function getData(resp){ return resp.data; }
   function loadCurrent(service){
-    return service.get($routeParams.id).then(function(contact){
-      angular.copy(contact, current);
-      return contact;
+    return service.get($routeParams.id).then(function(current){
+      angular.copy(current, service.__data);
+      return current;
     });
   }
 
-  var BASE_URL = '/api/contacts', current = {}, currentPromise = $q.when(current);
-
-  return {
-    index: function(){
-      return $http.get(BASE_URL).then(getData);
-    },
-    get: function(id){
-      return $http.get(BASE_URL + '/' + id).then(getData);
-    },
-    current: function(){
-      if($routeParams.id && current._id !== $routeParams.id){
-        angular.copy({}, current);
-        loadCurrent(this);
-      }
-      return currentPromise;
-    },
-    create: function(contact){
-      return $http.post(BASE_URL, contact).then(getData);
-    },
-    update: function(contact){
-      return $http.put(BASE_URL + '/' + contact.id, contact).then(getData);
-    },
-    delete: function(id){
-      return $http.delete(BASE_URL + '/' + id).then(getData);
-    }
+  var SimpleHttpService = function(baseUrl){
+    this.__data = {};
+    this.__promise = $q.when(this.__data);
+    this.baseUrl = baseUrl;
   };
+
+  SimpleHttpService.prototype.index = function(){
+    return $http.get(this.baseUrl).then(getData);
+  };
+  SimpleHttpService.prototype.get =  function(id){
+    return $http.get(this.baseUrl + '/' + id).then(getData);
+  };
+  SimpleHttpService.prototype.current = function(){
+    if($routeParams.id && this.__data._id !== $routeParams.id){
+      var self = this;
+      angular.copy({}, this.__data);
+      return $q.all([this.__promise, loadCurrent(this)]).then(function(){
+        return self.__data;
+      });
+    }
+    return this.__promise;
+  };
+  SimpleHttpService.prototype.create = function(contact){
+    return $http.post(this.baseUrl, contact).then(getData);
+  };
+  SimpleHttpService.prototype.update = function(contact){
+    return $http.put(this.baseUrl + '/' + contact._id, contact).then(getData);
+  };
+  SimpleHttpService.prototype.delete = function(id){
+    return $http.delete(this.baseUrl + '/' + id).then(getData);
+  };
+
+  return SimpleHttpService;
+})
+.service('Contacts', function($http, $q, $routeParams, SimpleHttpService){
+  return new SimpleHttpService('/contacts');
 })
 .controller('Navigation', function(Contacts, $location){
   var self = this;
@@ -62,15 +72,15 @@ angular.module('mcc', ['ngRoute'])
     return $location.path().indexOf(path) === 0;
   };
 })
-.controller('Index', function(Contacts){
+.controller('ContactIndex', function(Contacts){
   var self = this;
   Contacts.index().then(function(contacts) { self.contacts = contacts; });
 })
-.controller('Show', function(Contacts){
+.controller('ContactShow', function(Contacts){
   var self = this;
   Contacts.current().then(function(contact) { self.contact = contact; });
 })
-.controller('Edit', function(Contacts, $location){
+.controller('ContactEdit', function(Contacts, $location){
   var self = this, originalContact = null;
   Contacts.current().then(function(contact) {
     originalContact = contact;
@@ -79,7 +89,7 @@ angular.module('mcc', ['ngRoute'])
 
   this.save = function(contact){
     Contacts.update(contact).then(function(){
-      $location.path('/show/' + contact.id);
+      $location.path('/show/' + contact._id);
     });
   };
 
@@ -95,7 +105,7 @@ angular.module('mcc', ['ngRoute'])
     $location.path('/show/' + contact._id);
   };
 })
-.controller('Create', function(Contacts, $location){
+.controller('ContactCreate', function(Contacts, $location){
   this.contact = {};
   this.create = function(contact){
     Contacts.create(contact).then(function(createdContact){
