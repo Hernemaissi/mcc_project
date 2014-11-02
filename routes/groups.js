@@ -1,67 +1,54 @@
-var express = require('express');
-var router = express.Router();
-_ = require('lodash-node/underscore');
+var express = require('express'),
+  router = express.Router(),
+  respond = require('./responders'),
+  _ = require('lodash-node/underscore');
+
+function groups(req){
+  return req.db.collection('groupcollection');
+}
+function contacts(req){
+  return req.db.collection('contactcollection');
+}
 
 /* GET groups listing. */
 router.get('/', function(req, res) {
-  var groups = req.db.collection('groupcollection');
-  var json_result = "{}";
-  groups.find().toArray(function(err, result) {
-    if (err) { throw err; }
-    console.log(result);
-	json_result = result;
-	res.json(json_result);
-  });
+  groups(req).find().toArray(_.partial(res, respond.ok));
 });
 
 router.get('/:id', function(req, res) {
-  var groups = req.db.collection('groupcollection');
-  var json_result = "{}";
-  groups.findById(req.params.id, function(err, result) {
-    console.log(result);
-	json_result = result;
-	res.json(json_result);
-  });
+  groups(req).findById(req.params.id, _.partial(res, respond.ok));
 });
 
 router.post('/', function(req, res) {
-  var groups = req.db.collection('groupcollection');
-  var data = _.pick(req.body, 'name');
-  data.members = [];
-  console.log(data);
-  groups.insert(data, function(err, result) {
-    console.log(result);
-	json_result = result;
-	res.json(json_result);
+  var data = _.assign({ members: [] }, _.pick(req.body, 'name'));
+  groups(req).insert(data, _.partial(res, respond.created));
+});
+
+router.post('/:id/contacts/:contactId', function(req, res) {
+  groups(req).updateById(req.params.id, {'$push': { members: req.params.contactId } }, function(err) {
+    //TODO either remove or update group to be array to stay consistent when setting different group
+    contacts(req).updateById(req.params.contactId, { '$set' : { group: req.params.id }}, function(err2) {
+      res.updated(res, err || err2);
+    });
   });
 });
 
-router.put('/:id', function(req, res) {
-  var groups = req.db.collection('groupcollection');
-  var data = _.pick(req.body, 'add', 'contact_id' );
-  json_result = "";
-  
-  if (data.add) {
-    groups.updateById(req.params.id, {'$push': { members: data.contact_id} }, function(err) {
-	  req.db.collection('contactcollection').updateById(data.contact_id, { '$set' : {group: req.params.id}}, function(err) {});
-      res.send("Added member");
+router.delete('/:id/contacts/:contactId', function(req, res) {
+  groups(req).updateById(req.params.id, {'$pull': { members: req.params.contactId} }, function(err) {
+    //TODO either remove or update group to be array to stay consistent when setting different group
+    contacts(req).updateById(req.params.contactId, { '$unset' : { group: ""}}, function(err2) {
+      respond.deleted(res, err || err2);
     });
-  } else {
-    groups.updateById(req.params.id, {'$pull': { members: data.contact_id} }, function(err, result) {
-	  req.db.collection('contactcollection').updateById(data.contact_id, { '$unset' : { group: ""}}, function(err) {});
-      res.send("Removed member");
-    });
-  }
+  });
 });
 
 router.delete('/:id', function(req, res) {
-  var groups = req.db.collection('groupcollection');
-  var contacts = req.db.collection('contactcollection');
   console.log("Delete: " + req.params.id);
-  contacts.update({ group: req.params.id }, {'$unset' : { group: "" }}, { multi: true }, function(err) {});
-  groups.removeById(req.params.id, function(err, result) {
-    if(err) { throw err; }
-	res.json(result);
+  contacts(req).update({ group: req.params.id }, {'$unset' : { group: "" }}, { multi: true }, function(err) {
+    //TODO either remove or update group to be array to stay consistent when setting different group
+    groups(req).removeById(req.params.id, function(err2) {
+      respond.deleted(res, err || err2);
+    });
   });
 });
 
