@@ -57,7 +57,10 @@ angular.module('mcc', ['ngRoute'])
   return SimpleHttpService;
 })
 .service('Contacts', function($http, $q, $routeParams, SimpleHttpService){
-  return new SimpleHttpService('/contacts');
+  return new SimpleHttpService('/api/contacts');
+})
+.service('Groups', function($http, $q, $routeParams, SimpleHttpService){
+  return new SimpleHttpService('/api/groups');
 })
 .controller('Navigation', function(Contacts, $location){
   var self = this;
@@ -66,10 +69,14 @@ angular.module('mcc', ['ngRoute'])
   });
 
   this.pathEquals = function(path){
+    console.log($location.path());
     return $location.path() === path;
   };
   this.pathStarts = function(path){
     return $location.path().indexOf(path) === 0;
+  };
+  this.pathContains = function(path){
+    return $location.path().indexOf(path) !== -1;
   };
 })
 .controller('ContactIndex', function(Contacts){

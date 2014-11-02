@@ -5,7 +5,6 @@ var express = require('express'),
   mongoskin = require('mongoskin'),
   bodyParser = require('body-parser'),
   db = mongoskin.db('mongodb://@localhost:27017/mcc_data', {safe:true}),
-  users = require('./routes/users'),
   contacts = require('./routes/contacts'),
   groups = require('./routes/groups'),
   app = express();
@@ -28,9 +27,8 @@ app.use(function(req,res,next){
   next();
 });
 
-app.use('/users', users);
-app.use('/contacts', contacts);
-app.use('/groups', groups);
+app.use('/api/contacts', contacts);
+app.use('/api/groups', groups);
 app.use(express.static(__dirname + '/client/public'));
 app.get('*', function(req, res){
   res.render('index');

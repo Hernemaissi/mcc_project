@@ -2,13 +2,26 @@ extends layout
 
 block content
   div.container
-    ol.breadcrumb(ng-controller="Navigation as nav")
-      li(ng-class="{active: nav.pathEquals('') || nav.pathEquals('/')}")
-        a(href="/") Index
-      li.active(ng-if="nav.pathStarts('/show')") {{nav.contact.name}}
-      li.active(ng-if="nav.pathStarts('/edit')") {{nav.contact.name}}
-      li.active(ng-if="nav.pathStarts('/create')") Create
-    div(ng-view)
+    div(ng-controller="Navigation as nav")
+      nav.navbar.navbar-default
+        ul.nav.navbar-nav
+          li(ng-class="{active: nav.pathEquals('/')}")
+            a(href="/") Contacts
+          li(ng-class="{active: nav.pathEquals('/groups')}")
+            a(href="/groups") Groups
+      ol.breadcrumb(ng-if="!nav.pathContains('/groups') && !nav.pathEquals('/')")
+        li(ng-class="{active: nav.pathEquals('') || nav.pathEquals('/')}")
+          a(href="/") Contacts
+        li.active(ng-if="nav.pathStarts('/show')") {{nav.contact.name}}
+        li.active(ng-if="nav.pathStarts('/edit')") {{nav.contact.name}}
+        li.active(ng-if="nav.pathStarts('/create')") Create
+      ol.breadcrumb(ng-if="nav.pathContains('/groups') && !nav.pathEquals('/groups')")
+        li(ng-class="{active: nav.pathEquals('') || nav.pathEquals('/')}")
+          a(href="/groups") Groups
+        li.active(ng-if="nav.pathStarts('/groups/show')") {{nav.group.name}}
+        li.active(ng-if="nav.pathStarts('/groups/edit')") {{nav.group.name}}
+        li.active(ng-if="nav.pathStarts('/groups/create')") Create
+      div(ng-view)
 
   script(type="text/ng-template" id="/templates/contacts/index.html")
     a.btn.btn-primary(href="/create")
