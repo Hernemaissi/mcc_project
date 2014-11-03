@@ -5,13 +5,26 @@ angular.module('mcc', ['ngRoute'])
     templateUrl: '/templates/contacts/index.html',
   }).when('/', {
     templateUrl: '/templates/contacts/index.html',
-  }).when('/show/:id', {
-    templateUrl: '/templates/contacts/show.html',
   }).when('/edit/:id', {
     templateUrl: '/templates/contacts/edit.html',
   }).when('/create', {
     templateUrl: '/templates/contacts/create.html',
+  }).when('/groups/', {
+    templateUrl: '/templates/groups/index.html',
+  }).when('/groups/edit/:id', {
+    templateUrl: '/templates/groups/edit.html',
+  }).when('/groups/create', {
+    templateUrl: '/templates/groups/create.html',
   });
+})
+.filter('exclude', function(filterFilter){
+  return function(array, exclusions){
+    if(angular.isUndefined(array) ||  angular.isUndefined(exclusions)){
+      return array;
+    }
+
+    return filterFilter(array, function(obj){ return exclusions.indexOf(obj.id) === -1; });
+  };
 })
 .factory('SimpleHttpService', function($http, $q, $routeParams){
   function getData(resp){ return resp.data; }
@@ -44,11 +57,11 @@ angular.module('mcc', ['ngRoute'])
     }
     return this.__promise;
   };
-  SimpleHttpService.prototype.create = function(contact){
-    return $http.post(this.baseUrl, contact).then(getData);
+  SimpleHttpService.prototype.create = function(entity){
+    return $http.post(this.baseUrl, entity).then(getData);
   };
-  SimpleHttpService.prototype.update = function(contact){
-    return $http.put(this.baseUrl + '/' + contact._id, contact).then(getData);
+  SimpleHttpService.prototype.update = function(entity){
+    return $http.put(this.baseUrl + '/' + entity._id, entity).then(getData);
   };
   SimpleHttpService.prototype.delete = function(id){
     return $http.delete(this.baseUrl + '/' + id).then(getData);
@@ -60,7 +73,26 @@ angular.module('mcc', ['ngRoute'])
   return new SimpleHttpService('/api/contacts');
 })
 .service('Groups', function($http, $q, $routeParams, SimpleHttpService){
-  return new SimpleHttpService('/api/groups');
+  function getData(resp){ return resp.data; }
+
+  var GroupService = function(baseUrl){
+    this.__data = {};
+    this.__promise = $q.when(this.__data);
+    this.baseUrl = baseUrl;
+  };
+  angular.forEach(SimpleHttpService.prototype, function(method, key){
+    GroupService.prototype[key] = method;
+  });
+
+  GroupService.prototype.addContact = function(group, contact){
+    return $http.post(this.baseUrl + '/' + group._id + '/contacts/' + contact._id).then(getData);
+  };
+
+  GroupService.prototype.removeContact = function(group, contact){
+    return $http.delete(this.baseUrl + '/' + group._id + '/contacts/' + contact._id).then(getData);
+  };
+
+  return new GroupService('/api/groups');
 })
 .controller('Navigation', function(Contacts, $location){
   var self = this;
@@ -69,7 +101,6 @@ angular.module('mcc', ['ngRoute'])
   });
 
   this.pathEquals = function(path){
-    console.log($location.path());
     return $location.path() === path;
   };
   this.pathStarts = function(path){
@@ -122,5 +153,64 @@ angular.module('mcc', ['ngRoute'])
 
   this.cancel = function(){
     $location.path('/');
+  };
+})
+.controller('GroupIndex', function(Groups){
+  var self = this;
+  Groups.index().then(function(groups) { self.groups = groups; });
+})
+.controller('GroupShow', function(Groups){
+  var self = this;
+  Groups.current().then(function(group) { self.group = group; });
+})
+.controller('GroupEdit', function($location, Groups, Contacts){
+  var self = this, originalGroup = null;
+  Groups.current().then(function(group) {
+    originalGroup = group;
+    self.group = angular.copy(group);
+    self.members = [];
+    self.contacts = [];
+    Contacts.index().then(function(contacts){
+      self.contacts = contacts;
+      angular.forEach(contacts, function(contact){
+        if(self.group.members.indexOf(contact._id) !== -1){
+          self.members.push(contact);
+        }
+      });
+    });
+  });
+
+  this.save = function(group){
+    Groups.update(group).then(function(){
+      $location.path('/groups/show/' + group._id);
+    });
+  };
+
+  this.cancel = function(group){
+    $location.path('/groups/show/' + group._id);
+  };
+
+  this.addContact = function(group, contact){
+    Groups.addContact(group, contact).then(function(){
+      self.members.push(contact);
+    });
+  };
+
+  this.removeContact = function(group, contact){
+    Groups.removeContact(group, contact).then(function(){
+      self.members.splice(self.members.indexOf(contact._id), 1);
+    });
+  };
+})
+.controller('GroupCreate', function(Groups, $location){
+  this.group = {};
+  this.create = function(group){
+    Groups.create(group).then(function(createdContact){
+      $location.path('/groups/show/' + createdContact._id);
+    });
+  };
+
+  this.cancel = function(){
+    $location.path('/groups');
   };
 });

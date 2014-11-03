@@ -28,7 +28,7 @@ router.post('/:id/contacts/:contactId', function(req, res) {
   groups(req).updateById(req.params.id, {'$push': { members: req.params.contactId } }, function(err) {
     //TODO either remove or update group to be array to stay consistent when setting different group
     contacts(req).updateById(req.params.contactId, { '$set' : { group: req.params.id }}, function(err2) {
-      res.updated(res, err || err2);
+      respond.updated(res, err || err2);
     });
   });
 });
