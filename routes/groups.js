@@ -1,7 +1,7 @@
 var express = require('express'),
   router = express.Router(),
   respond = require('./responders'),
-  _ = require('lodash-node/underscore');
+  _ = require('lodash-node');
 
 function groups(req){
   return req.db.collection('groupcollection');
@@ -12,16 +12,16 @@ function contacts(req){
 
 /* GET groups listing. */
 router.get('/', function(req, res) {
-  groups(req).find().toArray(_.partial(res, respond.ok));
+  groups(req).find().toArray(_.partial(respond.ok, res));
 });
 
 router.get('/:id', function(req, res) {
-  groups(req).findById(req.params.id, _.partial(res, respond.ok));
+  groups(req).findById(req.params.id, _.partial(respond.ok, res));
 });
 
 router.post('/', function(req, res) {
   var data = _.assign({ members: [] }, _.pick(req.body, 'name'));
-  groups(req).insert(data, _.partial(res, respond.created));
+  groups(req).insert(data, _.partial(respond.created, res));
 });
 
 router.post('/:id/contacts/:contactId', function(req, res) {
