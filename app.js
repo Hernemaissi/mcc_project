@@ -9,6 +9,7 @@ var express = require('express'),
   users = require('./routes/users'),
   contacts = require('./routes/contacts'),
   groups = require('./routes/groups'),
+  gapi = require('./lib/gapi');
   app = express();
 
 // view engine setup
@@ -65,5 +66,5 @@ app.use(function(err, req, res) {
   });
 });
 
-
+exports.gapi = gapi;
 module.exports = app;
