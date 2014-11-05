@@ -1,7 +1,195 @@
 extends layout
 block content
-  h1= title
-  a(href= url)= "Get permissions"
-  form(method='post', action='/import/')
-    input(name='token')
-    input(type='submit', value='Import')
+
+  div.container
+    div(ng-controller="Navigation as nav")
+      nav.navbar.navbar-default
+        ul.nav.navbar-nav
+          li(ng-class="{active: nav.pathEquals('/')}")
+            a(href="/") Contacts
+          li(ng-class="{active: nav.pathEquals('/groups')}")
+            a(href="/groups") Groups
+      ol.breadcrumb(ng-if="!nav.pathContains('/groups') && !nav.pathEquals('/')")
+        li(ng-class="{active: nav.pathEquals('') || nav.pathEquals('/')}")
+          a(href="/") Contacts
+        li.active(ng-if="nav.pathStarts('/edit')") {{nav.contact.name}}
+        li.active(ng-if="nav.pathStarts('/create')") Create
+      ol.breadcrumb(ng-if="nav.pathContains('/groups') && !nav.pathEquals('/groups')")
+        li(ng-class="{active: nav.pathEquals('') || nav.pathEquals('/')}")
+          a(href="/groups") Groups
+        li.active(ng-if="nav.pathStarts('/groups/edit')") {{nav.group.name}}
+        li.active(ng-if="nav.pathStarts('/groups/create')") Create
+      div(ng-view)
+
+  script(type="text/ng-template" id="/templates/contacts/index.html")
+    a.btn.btn-primary(href="/create")
+      span.fa.fa-plus
+            span Create new contact
+    table.table(ng-controller="ContactIndex as index")
+      thead
+        tr
+          th Name
+          th Email
+          th
+      tbody
+        tr(ng-repeat="contact in index.contacts|orderBy:'name'")
+          td
+            a(ng-href="/edit/{{contact._id}}") {{ contact.name }}
+          td {{ contact.email }}
+          td
+            button.btn.btn-danger(ng-click="delete(contact)")
+              span.fa.fa-fw.fa-trash-o
+              span Delete
+
+  script(type="text/ng-template" id="/templates/contacts/edit.html")
+    form.col-xs-12.form-horizontal(ng-controller="ContactEdit as edit")
+      div.form-group
+        h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Contact details
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Name
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="edit.contact.name")
+          div.input-group-addon
+            span.fa.fa-fw.fa-user
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Email
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="email" ng-model="edit.contact.email")
+          div.input-group-addon
+            span.fa.fa-fw.fa-envelope-o
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Phone
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="edit.contact.phone")
+          div.input-group-addon
+            span.fa.fa-fw.fa-phone
+      div.form-group
+        div.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2
+          button.btn.btn-default(type="button" ng-click="edit.cancelChanges()" ng-disabled="!edit.changed(edit.contact)")
+            span.fa.fa-fw.fa-trash-o
+            span Remove changes
+          .pull-right
+            button.btn.btn-default(type="button" ng-click="edit.cancel(edit.contact)")
+              span.fa.fa-fw.fa-remove
+              span Cancel
+            button.btn.btn-primary(type="button" ng-click="edit.save(edit.contact)")
+              span.fa.fa-fw.fa-save
+              span Save
+
+  script(type="text/ng-template" id="/templates/contacts/create.html")
+    form.col-xs-12.form-horizontal(ng-controller="ContactCreate as create")
+      div.form-group
+        h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Contact details
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Name
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="create.contact.name")
+          div.input-group-addon
+            span.fa.fa-fw.fa-user
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Email
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="email" ng-model="create.contact.email")
+          div.input-group-addon
+            span.fa.fa-fw.fa-envelope-o
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Phone
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="create.contact.phone")
+          div.input-group-addon
+            span.fa.fa-fw.fa-phone
+      div.form-group
+        div.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2
+          .pull-right
+            button.btn.btn-default(type="button" ng-click="create.cancel()")
+              span.fa.fa-fw.fa-remove
+              span Cancel
+            button.btn.btn-primary(type="button" ng-click="create.create(create.contact)")
+              span.fa.fa-fw.fa-save
+              span Create
+
+  script(type="text/ng-template" id="/templates/groups/index.html")
+    a.btn.btn-primary(href="/groups/create")
+      span.fa.fa-plus
+            span Create new group
+    table.table(ng-controller="GroupIndex as index")
+      thead
+        tr
+          th Name
+          th Contacts
+          th
+      tbody
+        tr(ng-repeat="group in index.groups|orderBy:'name'")
+          td
+            a(ng-href="/groups/edit/{{group._id}}") {{ group.name }}
+          td {{ group.members.length | number }}
+          td
+            button.btn.btn-danger(ng-click="edit.delete(group)")
+              span.fa.fa-fw.fa-trash-o
+              span Delete
+
+  script(type="text/ng-template" id="/templates/groups/edit.html")
+    div.col-xs-12.form-horizontal(ng-controller="GroupEdit as edit")
+      div.form-group
+        h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Contact details
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Name
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="edit.group.name")
+          div.input-group-addon
+            span.fa.fa-fw.fa-group
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Contacts
+        div.col-xs-8.col-sm-10
+          table.table.table-striped
+            thead
+              tr
+                th Name
+                th
+            tbody
+              tr(ng-repeat="contact in edit.members|orderBy:'name'")
+                td
+                  a(ng-href="/edit/{{contact._id}}") {{ contact.name }}
+                td
+                  .pull-right
+                    button.btn.btn-danger(ng-click="edit.removeContact(edit.group, contact)")
+                      span.fa.fa-fw.fa-trash-o
+                      span Remove
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Add
+        div.input-group.col-xs-8.col-sm-10
+          select.form-control(ng-model="edit.currentContactSelection", ng-options="contact as contact.name for contact in edit.contacts | exclude:edit.members")
+          div.input-group-btn
+            button.btn.btn-primary(ng-click="edit.addContact(edit.group, edit.currentContactSelection)" ng-disabled="!edit.currentContactSelection")
+              span.fa.fa-fw.fa-plus
+      div.form-group
+        div.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2
+          .pull-right
+            button.btn.btn-primary(type="button" ng-click="edit.save(edit.group)")
+              span.fa.fa-fw.fa-save
+              span Save
+
+  script(type="text/ng-template" id="/templates/groups/create.html")
+    form.col-xs-12.form-horizontal(ng-controller="GroupCreate as create")
+      div.form-group
+        h3.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2 Group details
+      div.form-group
+        label.col-xs-4.col-sm-2.control-label Name
+        div.input-group.col-xs-8.col-sm-10
+          input.form-control(type="text" ng-model="create.group.name")
+          div.input-group-addon
+            span.fa.fa-fw.fa-group
+      div.form-group
+        div.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2
+          .pull-right
+            button.btn.btn-default(type="button" ng-click="create.cancel()")
+              span.fa.fa-fw.fa-remove
+              span Cancel
+            button.btn.btn-primary(type="button" ng-click="create.create(create.group)")
+              span.fa.fa-fw.fa-save
+              span Create
+			  
+	a(href= url)= "Get permissions"
+    form(method='post', action='/import/')
+      input(name='token')
+      input(type='submit', value='Import')

@@ -37,33 +37,9 @@
 
 ## API
 
-#### GET /contacts
+#### GET /api/contacts
 ##### Description
   Array of contact information
-##### Response
-  ```json
-  {
-    "name" : "name",
-    "email" : "email@example.com",
-    "phone" : "+123 456 7890"
-  }
-  ```
-##### Test Command
-  ```
-    curl \
-      -X GET \
-      -H "Accept: application/json" \
-      -H "Content-Type: application/json" \
-      http://localhost:3000/contacts
-  ```
-
-#### GET /contacts/:id
-##### Description
-  Get contact information by id
-##### Route Params
-   Param  |   Value 
-  ------- | -----------
-     id   |  Record id
 ##### Response
   ```json
   [
@@ -76,20 +52,44 @@
   ]
   ```
 ##### Test Command
+  ```
+    curl \
+      -X GET \
+      -H "Accept: application/json" \
+      -H "Content-Type: application/json" \
+      http://localhost:3000/api/contacts
+  ```
+
+#### GET /api/contacts/:id
+##### Description
+  Get contact information by id
+##### Route Params
+   Param  |   Value
+  ------- | -----------
+     id   |  Record id
+##### Response
+  ```json
+  {
+    "name" : "name",
+    "email" : "email@example.com",
+    "phone" : "+123 456 7890"
+  }
+  ```
+##### Test Command
   Replace :id with a contact id
   ```
     curl \
       -X GET \
       -H "Accept: application/json" \
       -H "Content-Type: application/json" \
-      http://localhost:3000/contacts/:id
+      http://localhost:3000/api/contacts/:id
   ```
 
-#### GET /contacts/search
+#### GET /api/contacts/search
 ##### Description
   Get contact information by id
 ##### Request Query Params
-   Param  |   Value 
+   Param  |   Value
   ------- | -----------
     q     |  Contact name (case-insensitive substring matched)
 ##### Response
@@ -110,10 +110,10 @@
       -X GET \
       -H "Accept: application/json" \
       -H "Content-Type: application/json" \
-      http://localhost:3000/contacts/search?q=te
+      http://localhost:3000/api/contacts/search?q=te
   ```
 
-#### POST /contacts
+#### POST /api/contacts
 ##### Description
   Create new contact information entry
 ##### Request Body
@@ -139,14 +139,35 @@
       -H "Accept: application/json" \
       -H "Content-Type: application/json" \
       -d '{"name":"test","email":"test@example.com", "phone":"+123 456 7890"}' \
-      http://localhost:3000/contacts
+      http://localhost:3000/api/contacts
   ```
 
-#### DELETE /contacts/:id
+#### PUT /api/contacts/:id
+##### Description
+  Get contact information by id
+##### Route Params
+   Param  |   Value
+  ------- | -----------
+     id   |  Record id
+##### Response
+  ```
+    HTTP Status 200
+  ```
+##### Test Command
+  Replace :id with a contact id
+  ```
+    curl \
+      -X PUT \
+      -H "Accept: application/json" \
+      -H "Content-Type: application/json" \
+      http://localhost:3000/api/contacts/:id
+  ```
+
+#### DELETE /api/contacts/:id
 ##### Description
   Delete contact information entry by id
 ##### Route Params
-   Param  |   Value 
+   Param  |   Value
   ------- | -----------
      id   |  Record id
 ##### Response
@@ -164,39 +185,39 @@
       -X DELETE \
       -H "Accept: application/json" \
       -H "Content-Type: application/json" \
-      http://localhost:3000/contacts/:id
+      http://localhost:3000/api/contacts/:id
   ```
-  
-#### GET /groups
+
+#### GET /api/groups
 ##### Description
   Array of group information
 ##### Response
   ```json
-  {
-      "name" : "name",
-      "members" : ["ID", "ID2"...]
-  },
-  ```
-
-#### GET /groups/:id
-##### Description
-  Get group information by id
-##### Route Params
-   Param  |   Value 
-  ------- | -----------
-     id   |  Record id
-##### Response
-  ```json
   [
     {
-      "name" : "name",
-      "members" : ["ID", "ID2"...]
+        "name" : "name",
+        "members" : ["ID", "ID2"...]
     },
     ...
   ]
   ```
-  
-#### POST /groups
+
+#### GET /api/groups/:id
+##### Description
+  Get group information by id
+##### Route Params
+   Param  |   Value
+  ------- | -----------
+     id   |  Record id
+##### Response
+  ```json
+  {
+    "name" : "name",
+    "members" : ["ID", "ID2"...]
+  }
+  ```
+
+#### POST /api/groups
 ##### Description
   Create new group entry
 ##### Request Body
@@ -212,50 +233,43 @@
     "members" : []
   }
   ```
-  
-#### DELETE /groups/:id
+
+#### DELETE /api/groups/:id
 ##### Description
   Delete group entry by id
 ##### Route Params
-   Param  |   Value 
+   Param  |   Value
   ------- | -----------
      id   |  Record id
 ##### Response
-  ```json
-  {
-      "name" : "name",
-      "members" : ["ID", "ID2"...]
-  },
   ```
-  
-#### PUT /groups/:id
+    HTTP Status 200
+  ```
+
+#### POST /api/groups/:id/contacts/:contactId
 ##### Description
-  Adds or removes a contact from group
+  Add a contact to group
 ##### Route Params
-   Param  |   Value 
-  ------- | -----------
-     id   |  Record id
+   Param    |   Value
+  -------   | -----------
+     id     |  Record id
+  contactId |  Contact record id
 
-##### Request Body on add
-  ```json
-  {
-    "add" : "true",
-    "contact_id" : ID
-  }
+##### Response
   ```
-##### Request Body on remove
-  ```json
-  {
-    "contact_id" : ID
-  }
+    HTTP Status 200
   ```
 
-##### Response on add
-  ```json
-  "Member added"
+#### DELETE /api/groups/:id/contacts/:contactId
+##### Description
+  Remove a contact from group
+##### Route Params
+   Param    |   Value
+  -------   | -----------
+     id     |  Record id
+  contactId |  Contact record id
+
+##### Response
   ```
-  
-##### Response on remove
-  ```json
-  "Member removed"
+    HTTP Status 200
   ```
