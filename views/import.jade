@@ -1,0 +1,7 @@
+extends layout
+block content
+
+  a(href= url)= "Get permissions"
+  form(method='post', action='/import/')
+    input(name='token')
+    input(type='submit', value='Import')

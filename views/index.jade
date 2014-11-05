@@ -1,6 +1,11 @@
 extends layout
 block content
 
+  a(href= url)= "Get permissions"
+  form(method='post', action='/import/')
+    input(name='token')
+    input(type='submit', value='Import')
+
   div.container
     div(ng-controller="Navigation as nav")
       nav.navbar.navbar-default
@@ -188,8 +193,4 @@ block content
             button.btn.btn-primary(type="button" ng-click="create.create(create.group)")
               span.fa.fa-fw.fa-save
               span Create
-			  
-	a(href= url)= "Get permissions"
-    form(method='post', action='/import/')
-      input(name='token')
-      input(type='submit', value='Import')
+  

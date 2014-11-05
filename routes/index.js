@@ -8,6 +8,7 @@ router.get('/', function(req, res) {
         title: 'This is my sample app',
 		url: gapi.url
       };
+  console.log(locals);
   res.render('index.jade', locals);
 });
 
@@ -24,7 +25,7 @@ router.post('/import', function(req, res) {
         title: 'This is my sample app',
 		url: gapi.url
       };
-  res.render('index.jade', locals);
+  res.render('import.jade', locals);
 });
 
 module.exports = router;

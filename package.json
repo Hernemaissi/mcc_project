@@ -16,6 +16,7 @@
     "mongodb": "*",
     "mongoskin": "*",
     "lodash-node": "^2.4.1",
-	"googleapis": "*"
+	"googleapis": "*",
+	"gdata-js": "*"
   }
 }

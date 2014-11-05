@@ -31,8 +31,50 @@ app.use(function(req,res,next){
 app.use('/api/contacts', contacts);
 app.use('/api/groups', groups);
 app.use(express.static(__dirname + '/client/public'));
+
+/* POST import page. */
+app.post('/import', function(req, res) {
+  console.log("Imported!");
+  console.log(req.body.token);
+  var code = req.body.token;
+  gapi.client.getToken(code, function(err, tokens){
+    console.log(tokens);
+    var client = require('gdata-js')(gapi.client_id, gapi.client_secret);
+	client.setToken({ access_token: tokens["access_token"], refresh_token: tokens["refresh_token"] });
+	client.getFeed('https://www.google.com/m8/feeds/contacts/default/full', function (err, result) {
+      for(var i in result.feed.entry) {
+	    var entry_name = JSON.stringify(result.feed.entry[i].title.$t);
+		entry_name = (entry_name === "\"\"") ? "" : entry_name.replace(/"/g, "");
+		var entry_email = (result.feed.entry[i].gd$email === undefined) ? "" : JSON.stringify(result.feed.entry[i].gd$email[0].address).replace(/"/g, "");
+		var entry_phone = (result.feed.entry[i].gd$phoneNumber === undefined) ? "GOOGLE" : JSON.stringify(result.feed.entry[i].gd$phoneNumber[0].uri).replace(/"/g, "");
+		if (entry_name.length > 0 && entry_email.length > 0) {
+	      var data = {};
+		  data.name = entry_name;
+		  data.email = entry_email;
+		  data.phone = entry_phone;
+		  console.log(data);
+		  req.db.collection('contactcollection').insert(data, function(err, result) {
+		    if (err) throw err;
+			if (result) console.log('Added!');
+		  });
+		}
+      }
+	  });
+  });
+  var locals = {
+        title: 'This is my sample app',
+		url: gapi.url
+      };
+  res.render('import.jade', locals);
+});
+
+
 app.get('*', function(req, res){
-  res.render('index');
+  var locals = {
+		url: gapi.url
+      };
+  console.log(locals);
+  res.render('index', locals);
 });
 
 // catch 404 and forward to error handler

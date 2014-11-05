@@ -1,10 +1,14 @@
 var express = require('express'),
   router = express.Router(),
   respond = require('./responders'),
+  gapi = require('../lib/gapi'),
   _ = require('lodash-node/underscore');
 
 /* GET users listing. */
 router.get('/', function(req, res) {
+  var locals = {
+		url: gapi.url
+      };
   req.db.collection('contactcollection').find().toArray(_.partial(respond.ok, res));
 });
 
