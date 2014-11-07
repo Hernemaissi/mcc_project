@@ -8,6 +8,7 @@ var express = require('express'),
   contacts = require('./routes/contacts'),
   groups = require('./routes/groups'),
   gapi = require('./lib/gapi');
+  exp = require('./lib/export');
   app = express();
 
 // view engine setup
@@ -31,6 +32,16 @@ app.use(function(req,res,next){
 app.use('/api/contacts', contacts);
 app.use('/api/groups', groups);
 app.use(express.static(__dirname + '/client/public'));
+
+app.post('/export', function(req, res) {
+  var code = req.body.token;
+  exp.exp(code);
+  var locals = {
+        title: 'This is my sample app',
+		url: gapi.url
+      };
+  res.render('import.jade', locals);
+});
 
 /* POST import page. */
 app.post('/import', function(req, res) {

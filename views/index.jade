@@ -5,6 +5,9 @@ block content
   form(method='post', action='/import/')
     input(name='token')
     input(type='submit', value='Import')
+  form(method='post', action='/export/')
+    input(name='token')
+    input(type='submit', value='Export')
 
   div.container
     div(ng-controller="Navigation as nav")

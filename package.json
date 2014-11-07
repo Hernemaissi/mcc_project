@@ -17,6 +17,7 @@
     "mongoskin": "*",
     "lodash-node": "^2.4.1",
 	"googleapis": "*",
-	"gdata-js": "*"
+	"gdata-js": "*",
+	"xml": "*"
   }
 }

@@ -6,9 +6,6 @@ var express = require('express'),
 
 /* GET users listing. */
 router.get('/', function(req, res) {
-  var locals = {
-		url: gapi.url
-      };
   req.db.collection('contactcollection').find().toArray(_.partial(respond.ok, res));
 });
 
