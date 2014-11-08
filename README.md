@@ -273,3 +273,11 @@
   ```
     HTTP Status 200
   ```
+  
+## Importing and Exporting
+
+You can import your Google contacts into the app and export the contacts from the
+app into your Google contacts. To do this. First obtain a key by following the
+"Get Permissions" link and logging in with your google account.
+Paste the code you receive and press "Import" to import contacts from Google
+or press "Export" to export the contact from the app to Google.
