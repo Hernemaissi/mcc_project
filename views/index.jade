@@ -18,12 +18,12 @@ block content
           li(ng-class="{active: nav.pathEquals('/groups')}")
             a(href="/groups") Groups
       ol.breadcrumb(ng-if="!nav.pathContains('/groups') && !nav.pathEquals('/')")
-        li(ng-class="{active: nav.pathEquals('') || nav.pathEquals('/')}")
+        li
           a(href="/") Contacts
         li.active(ng-if="nav.pathStarts('/edit')") {{nav.contact.name}}
         li.active(ng-if="nav.pathStarts('/create')") Create
       ol.breadcrumb(ng-if="nav.pathContains('/groups') && !nav.pathEquals('/groups')")
-        li(ng-class="{active: nav.pathEquals('') || nav.pathEquals('/')}")
+        li
           a(href="/groups") Groups
         li.active(ng-if="nav.pathStarts('/groups/edit')") {{nav.group.name}}
         li.active(ng-if="nav.pathStarts('/groups/create')") Create
@@ -45,7 +45,7 @@ block content
             a(ng-href="/edit/{{contact._id}}") {{ contact.name }}
           td {{ contact.email }}
           td
-            button.btn.btn-danger(ng-click="delete(contact)")
+            button.btn.btn-danger(ng-click="index.delete(contact)")
               span.fa.fa-fw.fa-trash-o
               span Delete
 
@@ -77,12 +77,16 @@ block content
             span.fa.fa-fw.fa-trash-o
             span Remove changes
           .pull-right
-            button.btn.btn-default(type="button" ng-click="edit.cancel(edit.contact)")
+            button.btn.btn-default(type="button" ng-click="edit.cancel()")
               span.fa.fa-fw.fa-remove
               span Cancel
-            button.btn.btn-primary(type="button" ng-click="edit.save(edit.contact)")
-              span.fa.fa-fw.fa-save
-              span Save
+            button.btn(type="button" ng-click="edit.save(edit.contact)", ng-class="{'btn-primary': edit.changed(edit.contact), 'btn-success': !edit.changed(edit.contact) }", ng-disabled="!edit.changed(edit.contact)")
+              span(ng-if="edit.changed(edit.contact)")
+                span.fa.fa-fw.fa-save
+                span Save
+              span(ng-if="!edit.changed(edit.contact)")
+                span.fa.fa-fw.fa-check
+                span Saved
 
   script(type="text/ng-template" id="/templates/contacts/create.html")
     form.col-xs-12.form-horizontal(ng-controller="ContactCreate as create")
@@ -132,7 +136,7 @@ block content
             a(ng-href="/groups/edit/{{group._id}}") {{ group.name }}
           td {{ group.members.length | number }}
           td
-            button.btn.btn-danger(ng-click="edit.delete(group)")
+            button.btn.btn-danger(ng-click="index.delete(group)")
               span.fa.fa-fw.fa-trash-o
               span Delete
 
@@ -166,16 +170,19 @@ block content
       div.form-group
         label.col-xs-4.col-sm-2.control-label Add
         div.input-group.col-xs-8.col-sm-10
-          select.form-control(ng-model="edit.currentContactSelection", ng-options="contact as contact.name for contact in edit.contacts | exclude:edit.members")
-          div.input-group-btn
-            button.btn.btn-primary(ng-click="edit.addContact(edit.group, edit.currentContactSelection)" ng-disabled="!edit.currentContactSelection")
-              span.fa.fa-fw.fa-plus
+          select.form-control(ng-model="edit.currentContactSelection", ng-options="contact as contact.name for contact in edit.contacts | exclude:edit.members", ng-change="edit.addContact(edit.group, edit.currentContactSelection)")
       div.form-group
         div.col-xs-8.col-xs-offset-4.col-sm-10.col-sm-offset-2
+          p.text.text-success(ng-if="edit.saved === true") Saved
+          p.text.text-danger(ng-if="edit.saved === false") Save failed
           .pull-right
-            button.btn.btn-primary(type="button" ng-click="edit.save(edit.group)")
-              span.fa.fa-fw.fa-save
-              span Save
+            button.btn(type="button" ng-click="edit.save(edit.group)", ng-class="{'btn-primary': edit.changed(edit.group), 'btn-success': !edit.changed(edit.group) }", ng-disabled="!edit.changed(edit.group)")
+              span(ng-if="edit.changed(edit.group)")
+                span.fa.fa-fw.fa-save
+                span Save
+              span(ng-if="!edit.changed(edit.group)")
+                span.fa.fa-fw.fa-check
+                span Saved
 
   script(type="text/ng-template" id="/templates/groups/create.html")
     form.col-xs-12.form-horizontal(ng-controller="GroupCreate as create")
@@ -196,4 +203,4 @@ block content
             button.btn.btn-primary(type="button" ng-click="create.create(create.group)")
               span.fa.fa-fw.fa-save
               span Create
-  
+

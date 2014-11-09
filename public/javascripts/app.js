@@ -63,8 +63,8 @@ angular.module('mcc', ['ngRoute'])
   SimpleHttpService.prototype.update = function(entity){
     return $http.put(this.baseUrl + '/' + entity._id, entity).then(getData);
   };
-  SimpleHttpService.prototype.delete = function(id){
-    return $http.delete(this.baseUrl + '/' + id).then(getData);
+  SimpleHttpService.prototype.delete = function(entity){
+    return $http.delete(this.baseUrl + '/' + entity._id).then(getData);
   };
 
   return SimpleHttpService;
@@ -94,10 +94,14 @@ angular.module('mcc', ['ngRoute'])
 
   return new GroupService('/api/groups');
 })
-.controller('Navigation', function(Contacts, $location){
+.controller('Navigation', function($location, Contacts, Groups){
   var self = this;
   Contacts.current().then(function(contact){
     self.contact = contact;
+  });
+
+  Groups.current().then(function(group){
+    self.group = group;
   });
 
   this.pathEquals = function(path){
@@ -113,10 +117,12 @@ angular.module('mcc', ['ngRoute'])
 .controller('ContactIndex', function(Contacts){
   var self = this;
   Contacts.index().then(function(contacts) { self.contacts = contacts; });
-})
-.controller('ContactShow', function(Contacts){
-  var self = this;
-  Contacts.current().then(function(contact) { self.contact = contact; });
+
+  this.delete = function(contact){
+    Contacts.delete(contact).then(function(){
+      self.contacts.splice(self.contacts.indexOf(contact), 1);
+    });
+  };
 })
 .controller('ContactEdit', function(Contacts, $location){
   var self = this, originalContact = null;
@@ -127,7 +133,7 @@ angular.module('mcc', ['ngRoute'])
 
   this.save = function(contact){
     Contacts.update(contact).then(function(){
-      $location.path('/show/' + contact._id);
+      angular.copy(contact, originalContact);
     });
   };
 
@@ -139,15 +145,15 @@ angular.module('mcc', ['ngRoute'])
     self.contact = angular.copy(originalContact);
   };
 
-  this.cancel = function(contact){
-    $location.path('/show/' + contact._id);
+  this.cancel = function(){
+    $location.path('/contacts');
   };
 })
 .controller('ContactCreate', function(Contacts, $location){
   this.contact = {};
   this.create = function(contact){
     Contacts.create(contact).then(function(createdContact){
-      $location.path('/show/' + createdContact._id);
+      $location.path('/edit/' + createdContact._id);
     });
   };
 
@@ -158,10 +164,12 @@ angular.module('mcc', ['ngRoute'])
 .controller('GroupIndex', function(Groups){
   var self = this;
   Groups.index().then(function(groups) { self.groups = groups; });
-})
-.controller('GroupShow', function(Groups){
-  var self = this;
-  Groups.current().then(function(group) { self.group = group; });
+
+  this.delete = function(group){
+    Groups.delete(group).then(function(){
+      self.groups.splice(self.groups.indexOf(group), 1);
+    });
+  };
 })
 .controller('GroupEdit', function($location, Groups, Contacts){
   var self = this, originalGroup = null;
@@ -182,12 +190,8 @@ angular.module('mcc', ['ngRoute'])
 
   this.save = function(group){
     Groups.update(group).then(function(){
-      $location.path('/groups/show/' + group._id);
+      angular.copy(group, originalGroup);
     });
-  };
-
-  this.cancel = function(group){
-    $location.path('/groups/show/' + group._id);
   };
 
   this.addContact = function(group, contact){
@@ -201,12 +205,16 @@ angular.module('mcc', ['ngRoute'])
       self.members.splice(self.members.indexOf(contact._id), 1);
     });
   };
+
+  this.changed = function(group){
+    return !angular.equals(group, originalGroup);
+  };
 })
 .controller('GroupCreate', function(Groups, $location){
   this.group = {};
   this.create = function(group){
     Groups.create(group).then(function(createdContact){
-      $location.path('/groups/show/' + createdContact._id);
+      $location.path('/groups/edit/' + createdContact._id);
     });
   };
 

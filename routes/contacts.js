@@ -1,7 +1,6 @@
 var express = require('express'),
   router = express.Router(),
   respond = require('./responders'),
-  gapi = require('../lib/gapi'),
   _ = require('lodash-node/underscore');
 
 /* GET users listing. */
@@ -22,8 +21,9 @@ router.get('/:id', function(req, res) {
 });
 
 router.put('/:id', function(req, res) {
-  console.log("Fetch: " + req.params.id);
-  req.db.collection('contactcollection').updateById(req.params.id, _.partial(respond.updated, res));
+  console.log("Update: " + req.params.id);
+  var data = _.pick(req.body, 'name', 'phone', 'email');
+  req.db.collection('contactcollection').updateById(req.params.id, { '$set' : data }, _.partial(respond.updated, res));
 });
 
 router.post('/', function(req, res) {

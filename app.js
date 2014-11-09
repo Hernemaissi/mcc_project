@@ -7,8 +7,8 @@ var express = require('express'),
   db = mongoskin.db('mongodb://@localhost:27017/mcc_data', {safe:true}),
   contacts = require('./routes/contacts'),
   groups = require('./routes/groups'),
-  gapi = require('./lib/gapi');
-  exp = require('./lib/export');
+  gapi = require('./lib/gapi'),
+  exp = require('./lib/export'),
   app = express();
 
 // view engine setup

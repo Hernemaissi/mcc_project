@@ -24,6 +24,12 @@ router.post('/', function(req, res) {
   groups(req).insert(data, _.partial(respond.created, res));
 });
 
+router.put('/:id', function(req, res) {
+  console.log("Update: " + req.params.id);
+  var data = _.pick(req.body, 'name');
+  groups(req).updateById(req.params.id, { '$set' : data }, _.partial(respond.updated, res));
+});
+
 router.post('/:id/contacts/:contactId', function(req, res) {
   groups(req).updateById(req.params.id, {'$push': { members: req.params.contactId } }, function(err) {
     //TODO either remove or update group to be array to stay consistent when setting different group
